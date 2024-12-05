@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import tukano.api.Blobs;
 import tukano.api.Result;
 import tukano.api.Short;
 import tukano.api.Shorts;
@@ -30,6 +29,7 @@ public class JavaShorts implements Shorts {
 
 	private static Shorts instance;
 	private static boolean cache = true;
+	private static String NAME = "blobs";
 
 	synchronized public static Shorts getInstance() {
 		if (instance == null)
@@ -45,9 +45,9 @@ public class JavaShorts implements Shorts {
 		Log.info(() -> format("createShort : userId = %s, pwd = %s\n", userId, password));
 
 		return errorOrResult(okUser(userId, password), user -> {
-			
+
 			var shortId = format("%s+%s", userId, UUID.randomUUID());
-			var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
+			var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, NAME, shortId);
 			var shrt = new Short(shortId, userId, blobUrl);
 
 			Result<Short> dbResult = DB.insertOne(shrt);
@@ -95,8 +95,6 @@ public class JavaShorts implements Shorts {
 
 					var query = format("DELETE FROM Likes WHERE shortId = '%s'", shortId);
 					hibernate.createNativeQuery(query, Likes.class).executeUpdate();
-
-					JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get());
 				});
 			});
 		});
@@ -110,7 +108,7 @@ public class JavaShorts implements Shorts {
 		return errorOrValue(okUser(userId), DB.sql(query, String.class));
 	}
 
-	//we dont save follows on cache
+	// we dont save follows on cache
 	@Override
 	public Result<Void> follow(String userId1, String userId2, boolean isFollowing, String password) {
 		Log.info(() -> format("follow : userId1 = %s, userId2 = %s, isFollowing = %s, pwd = %s\n", userId1, userId2,

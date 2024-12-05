@@ -57,14 +57,14 @@ public class JavaUsers implements Users {
 
 		if (userId == null)
 			return error(BAD_REQUEST);
-			Result<User> result;
-		if(cache){			
-			 result = Cache.getOne(userId, User.class);
-			 if (!result.isOK()) {
+		Result<User> result;
+		if (cache) {
+			result = Cache.getOne(userId, User.class);
+			if (!result.isOK()) {
 				result = DB.getOne(userId, User.class);
 			}
-		}
-		else result = DB.getOne(userId, User.class);
+		} else
+			result = DB.getOne(userId, User.class);
 		Authentication.login(userId, pwd);
 		return validatedUserOrError(result, pwd);
 	}
@@ -101,7 +101,6 @@ public class JavaUsers implements Users {
 			// Delete user shorts and related info asynchronously in a separate thread
 			Executors.defaultThreadFactory().newThread(() -> {
 				JavaShorts.getInstance().deleteAllShorts(userId, pwd, Token.get(userId));
-				JavaBlobs.getInstance().deleteAllBlobs(userId, Token.get(userId));
 			}).start();
 
 			Result<User> dbResult = DB.deleteOne(user);

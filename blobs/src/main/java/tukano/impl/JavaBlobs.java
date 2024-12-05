@@ -1,4 +1,4 @@
-package tukano.impl;
+package src.tukano.impl;
 
 import static java.lang.String.format;
 import static tukano.api.Result.error;
@@ -51,7 +51,6 @@ public class JavaBlobs implements Blobs {
 
 		Authentication.validateSession();
 
-
 		return storage.write(toPath(blobId), bytes);
 	}
 
@@ -61,7 +60,7 @@ public class JavaBlobs implements Blobs {
 
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
-		
+
 		Authentication.validateSession();
 
 		return storage.read(toPath(blobId));
@@ -87,7 +86,7 @@ public class JavaBlobs implements Blobs {
 			return error(FORBIDDEN);
 
 		Authentication.validateSession("admin");
-		
+
 		return storage.delete(toPath(blobId));
 	}
 
@@ -100,12 +99,11 @@ public class JavaBlobs implements Blobs {
 
 		Authentication.validateSession();
 
-
 		return storage.delete(toPath(userId));
 	}
 
 	private boolean validBlobId(String blobId, String token) {
-		//System.out.println(toURL(blobId));
+		// System.out.println(toURL(blobId));
 		return Token.isValid(token, toURL(blobId));
 	}
 

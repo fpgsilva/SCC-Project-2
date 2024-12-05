@@ -28,11 +28,7 @@ public class TukanoRestServer extends Application {
 	public TukanoRestServer() {
 		serverURI = "";
 		Token.setSecret(Args.valueOf("-secret", "spotingale"));
-		resources.add(RestUsersResource.class);
-		resources.add(RestShortsResource.class);
-
-		// resources.add(ControlResource.class);
-
+		resources.add(RestBlobsResource.class);
 		resources.add(RequestCookiesFilter.class);
 		resources.add(RequestCookiesCleanupFilter.class);
 		resources.add(Authentication.class);
