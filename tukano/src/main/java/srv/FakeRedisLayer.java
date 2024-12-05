@@ -13,7 +13,6 @@ public class FakeRedisLayer {
 		return instance;
 	}
 	
-	
 	public void putSession(Session s) {
 		sessions.put(s.uid(), s);
 	}

@@ -17,8 +17,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import srv.auth.RequestCookies;
+import tukano.impl.cache.RedisCache;
 
-@Path(Authentication.PATH)
 public class Authentication {
 	static final String PATH = "login";
 	static final String USER = "username";
@@ -27,7 +27,7 @@ public class Authentication {
 	static final String LOGIN_PAGE = "login.html";
 	private static final int MAX_COOKIE_AGE = 3600;
 
-	public Response login( String userID,String password ) {
+	public static Response login( String userID,String password ) {
 		System.out.println("user: " + userID + " pwd:" + password );
 		boolean pwdOk = true; //replace with code to check user password
 		if (pwdOk) {
@@ -40,7 +40,7 @@ public class Authentication {
 					.httpOnly(true)
 					.build();
 			//maybe not fake redis layer
-			FakeRedisLayer.getInstance().putSession( new Session( uid, userID));	
+			RedisCache.getRedisCache().putSession( new Session( uid, userID));	
 			
             return Response.ok()
                     .cookie(cookie) 
@@ -69,7 +69,7 @@ public class Authentication {
 		if (cookie == null )
 			throw new NotAuthorizedException("No session initialized");
 		
-		var session = FakeRedisLayer.getInstance().getSession( cookie.getValue());
+		var session = RedisCache.getRedisCache().getSession( cookie.getValue());
 		if( session == null )
 			throw new NotAuthorizedException("No valid session initialized");
 			
@@ -88,7 +88,7 @@ public class Authentication {
 		if (cookie == null )
 			throw new NotAuthorizedException("No session initialized");
 		
-		var session = FakeRedisLayer.getInstance().getSession( cookie.getValue());
+		var session = RedisCache.getRedisCache().getSession( cookie.getValue());
 		if( session == null )
 			throw new NotAuthorizedException("No valid session initialized");
 			

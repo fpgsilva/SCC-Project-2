@@ -18,7 +18,6 @@ public class Cache {
     }
 
     public static <T> Result<T> insertOne(T obj) {
-        System.out.println("HELLO IM AT cache insert");
         return Result.errorOrValue(RedisCache.getRedisCache().insertOne(obj), obj);
     }
 }

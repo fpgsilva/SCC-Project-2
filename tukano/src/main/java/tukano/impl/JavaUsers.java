@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import srv.Authentication;
 import tukano.api.Result;
 import tukano.api.User;
 import tukano.api.Users;
@@ -31,6 +32,7 @@ public class JavaUsers implements Users {
 	}
 
 	private JavaUsers() {
+		createUser(new User("admin", "admin", "admin", "admin"));
 	}
 
 	@Override
@@ -56,13 +58,14 @@ public class JavaUsers implements Users {
 		if (userId == null)
 			return error(BAD_REQUEST);
 			Result<User> result;
-		if(cache){
+		if(cache){			
 			 result = Cache.getOne(userId, User.class);
 			 if (!result.isOK()) {
 				result = DB.getOne(userId, User.class);
 			}
 		}
 		else result = DB.getOne(userId, User.class);
+		Authentication.login(userId, pwd);
 		return validatedUserOrError(result, pwd);
 	}
 

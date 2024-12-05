@@ -1,11 +1,14 @@
 package tukano.impl.cache;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
+import srv.Session;
 import tukano.api.Result;
 import tukano.api.User;
 import tukano.api.Short;
@@ -28,6 +31,10 @@ public class RedisCache {
     private static String MOST_RECENT_SHORTS_LIST = "MostRecentShorts";
     private static String MOST_RECENT_LIKES_LIST = "MostRecentLikes";
     private static String MOST_RECENT_FOLLOWS_LIST = "MostRecentFollows";
+    
+
+    Map<String, Session> sessions = new ConcurrentHashMap<>();
+
 
     public static synchronized RedisCache getRedisCache() {
         if (redis_instance != null)
@@ -36,6 +43,14 @@ public class RedisCache {
         redis_instance = new RedisCache();
         return redis_instance;
     }
+
+    public void putSession(Session s) {
+		sessions.put(s.uid(), s);
+	}
+	
+	public Session getSession(String uid) {
+		return sessions.get(uid);
+	}
 
     public synchronized static JedisPool getCachePool() {
         if (jedis_instance != null)
@@ -55,10 +70,10 @@ public class RedisCache {
     }
 
     public <T> Result<T> getOne(String id, Class<T> clazz) {
-        System.out.println("GET ONE CACHE LAYER");
+        //System.out.println("GET ONE CACHE LAYER");
         var cId = clazz.getName();
-        System.out.println("class name on redis is ");
-        System.out.println(cId);
+        //System.out.println("class name on redis is ");
+        //System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + id;

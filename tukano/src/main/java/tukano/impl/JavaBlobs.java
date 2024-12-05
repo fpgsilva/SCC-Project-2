@@ -7,6 +7,7 @@ import static tukano.api.Result.ErrorCode.FORBIDDEN;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import srv.Authentication;
 import tukano.api.Blobs;
 import tukano.api.Result;
 import tukano.impl.rest.TukanoRestServer;
@@ -48,6 +49,9 @@ public class JavaBlobs implements Blobs {
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
 
+		Authentication.validateSession();
+
+
 		return storage.write(toPath(blobId), bytes);
 	}
 
@@ -57,6 +61,8 @@ public class JavaBlobs implements Blobs {
 
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
+		
+		Authentication.validateSession();
 
 		return storage.read(toPath(blobId));
 	}
@@ -68,6 +74,8 @@ public class JavaBlobs implements Blobs {
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
 
+		Authentication.validateSession();
+
 		return storage.read(toPath(blobId), sink);
 	}
 
@@ -78,6 +86,8 @@ public class JavaBlobs implements Blobs {
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
 
+		Authentication.validateSession("admin");
+		
 		return storage.delete(toPath(blobId));
 	}
 
@@ -88,11 +98,14 @@ public class JavaBlobs implements Blobs {
 		if (!Token.isValid(token, userId))
 			return error(FORBIDDEN);
 
+		Authentication.validateSession();
+
+
 		return storage.delete(toPath(userId));
 	}
 
 	private boolean validBlobId(String blobId, String token) {
-		System.out.println(toURL(blobId));
+		//System.out.println(toURL(blobId));
 		return Token.isValid(token, toURL(blobId));
 	}
 
