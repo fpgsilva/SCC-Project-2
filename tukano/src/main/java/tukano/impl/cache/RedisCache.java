@@ -19,11 +19,11 @@ import tukano.impl.data.Likes;
 import utils.JSON;
 
 public class RedisCache {
-    private static final String RedisHostname = "";//docker service - name
-    private static final String RedisKey = "";
+    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "redis"); // docker service -
+                                                                                                  // name
+    private static final String REDIS_KEY = System.getenv("REDIS_KEY");
     private static final int REDIS_PORT = 6380;
     private static final int REDIS_TIMEOUT = 1000;
-    private static final boolean Redis_USE_TLS = true;
 
     private static JedisPool jedis_instance;
     private static RedisCache redis_instance;
@@ -31,10 +31,8 @@ public class RedisCache {
     private static String MOST_RECENT_SHORTS_LIST = "MostRecentShorts";
     private static String MOST_RECENT_LIKES_LIST = "MostRecentLikes";
     private static String MOST_RECENT_FOLLOWS_LIST = "MostRecentFollows";
-    
 
     Map<String, Session> sessions = new ConcurrentHashMap<>();
-
 
     public static synchronized RedisCache getRedisCache() {
         if (redis_instance != null)
@@ -45,12 +43,12 @@ public class RedisCache {
     }
 
     public void putSession(Session s) {
-		sessions.put(s.uid(), s);
-	}
-	
-	public Session getSession(String uid) {
-		return sessions.get(uid);
-	}
+        sessions.put(s.uid(), s);
+    }
+
+    public Session getSession(String uid) {
+        return sessions.get(uid);
+    }
 
     public synchronized static JedisPool getCachePool() {
         if (jedis_instance != null)
@@ -65,15 +63,16 @@ public class RedisCache {
         poolConfig.setTestWhileIdle(true);
         poolConfig.setNumTestsPerEvictionRun(3);
         poolConfig.setBlockWhenExhausted(true);
-        jedis_instance = new JedisPool(poolConfig, RedisHostname, REDIS_PORT, REDIS_TIMEOUT, RedisKey, Redis_USE_TLS);
+
+        jedis_instance = new JedisPool(poolConfig, REDIS_HOST, REDIS_PORT, REDIS_TIMEOUT, REDIS_KEY);
         return jedis_instance;
     }
 
     public <T> Result<T> getOne(String id, Class<T> clazz) {
-        //System.out.println("GET ONE CACHE LAYER");
+        // System.out.println("GET ONE CACHE LAYER");
         var cId = clazz.getName();
-        //System.out.println("class name on redis is ");
-        //System.out.println(cId);
+        // System.out.println("class name on redis is ");
+        // System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + id;
