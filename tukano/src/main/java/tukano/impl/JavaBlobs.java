@@ -28,7 +28,7 @@ public class JavaBlobs implements Blobs {
 	}
 
 	private JavaBlobs() {
-		storage = new RemoteStorage();
+		storage = RemoteStorage.createInstance();
 	}
 
 	@Override
@@ -38,6 +38,8 @@ public class JavaBlobs implements Blobs {
 
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
+
+		Authentication.validateSession();
 
 		return storage.write(toPath(blobId), bytes);
 	}
@@ -49,6 +51,8 @@ public class JavaBlobs implements Blobs {
 		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
 
+		Authentication.validateSession();
+
 		return storage.read(toPath(blobId));
 	}
 
@@ -56,8 +60,10 @@ public class JavaBlobs implements Blobs {
 	public Result<Void> delete(String blobId, String token) {
 		Log.info(() -> format("delete : blobId = %s, token=%s\n", blobId, token));
 
-		if (!validBlobId(blobId, token) || !Authentication.validateSession("admin"))
+		if (!validBlobId(blobId, token))
 			return error(FORBIDDEN);
+
+		Authentication.validateSession("admin");
 
 		return storage.delete(toPath(blobId));
 	}
@@ -69,21 +75,17 @@ public class JavaBlobs implements Blobs {
 		if (!Token.isValid(token, userId))
 			return error(FORBIDDEN);
 
-		Authentication.validateSession();
+		Authentication.validateSession("admin");
 
 		return storage.delete(toPath(userId));
 	}
 
 	private boolean validBlobId(String blobId, String token) {
 		// System.out.println(toURL(blobId));
-		return Token.isValid(token, toURL(blobId));
+		return Token.isValid(token, blobId);
 	}
 
 	private String toPath(String blobId) {
 		return blobId.replace("+", "/");
-	}
-
-	private String toURL(String blobId) {
-		return baseURI + blobId;
 	}
 }
