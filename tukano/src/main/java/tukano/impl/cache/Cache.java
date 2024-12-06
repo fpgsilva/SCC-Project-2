@@ -5,7 +5,7 @@ import tukano.api.Result;
 public class Cache {
 
     public static <T> Result<T> getOne(String id, Class<T> clazz) {
-        return RedisCache.getRedisCache().getOne(id, clazz); // get one container id string, class = User
+        return RedisCache.getRedisCache().getOne(id, clazz);
     }
 
     @SuppressWarnings("unchecked")

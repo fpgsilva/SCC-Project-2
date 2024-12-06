@@ -23,7 +23,7 @@ public class RemoteStorage implements BlobStorage {
     private static final String STORAGE_HOST = System.getenv().getOrDefault("BLOB_STORAGE_HOST", "storage");
     private static final String STORAGE_PORT = System.getenv().getOrDefault("BLOB_STORAGE_PORT", "8081");
     private static final String STORAGE_URL = String.format("http://%s:%s/rest/blobs", STORAGE_HOST, STORAGE_PORT);
-    private static final String STORAGE_TOKEN = ""; // TODO
+    private static final String STORAGE_TOKEN = String.format("Bearer %s", System.getenv("BLOB_STORAGE_TOKEN"));
 
     protected static final int MAX_RETRIES = 4;
     protected static final int RETRY_SLEEP = 1000;
@@ -41,7 +41,7 @@ public class RemoteStorage implements BlobStorage {
     private Result<Void> _write(String path, byte[] bytes) {
         Response res = client
                 .target(STORAGE_URL)
-                .path(path.replace("/", "")) // TODO replacement
+                .path(path.replace("/", "%2F"))
                 .request()
                 .header("Authorization", STORAGE_TOKEN)
                 .post(Entity.entity(bytes, MediaType.APPLICATION_OCTET_STREAM_TYPE));
@@ -52,7 +52,7 @@ public class RemoteStorage implements BlobStorage {
     private Result<byte[]> _read(String path) {
         Response res = client
                 .target(STORAGE_URL)
-                .path(path.replace("/", "")) // TODO replacement
+                .path(path.replace("/", "%2F"))
                 .request()
                 .accept(MediaType.APPLICATION_OCTET_STREAM_TYPE)
                 .header("Authorization", STORAGE_TOKEN)
@@ -64,7 +64,7 @@ public class RemoteStorage implements BlobStorage {
     private Result<Void> _delete(String path) {
         Response res = client
                 .target(STORAGE_URL)
-                .path(path.replace("/", "")) // TODO replacement
+                .path(path.replace("/", "%2F"))
                 .request()
                 .header("Authorization", STORAGE_TOKEN)
                 .delete();

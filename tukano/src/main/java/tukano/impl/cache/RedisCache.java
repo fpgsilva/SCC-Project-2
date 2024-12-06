@@ -69,10 +69,7 @@ public class RedisCache {
     }
 
     public <T> Result<T> getOne(String id, Class<T> clazz) {
-        // System.out.println("GET ONE CACHE LAYER");
         var cId = clazz.getName();
-        // System.out.println("class name on redis is ");
-        // System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + id;
@@ -120,7 +117,7 @@ public class RedisCache {
                 var value = JSON.encode(obj);
                 jedis.set(key, value);
 
-                // depende do tipo de obj
+                // depends on the type of object
                 var list = getObjectList(obj);
                 jedis.lpush(list, value);
                 if (jedis.llen(list) > 5) {
@@ -167,7 +164,6 @@ public class RedisCache {
         try {
             return Result.ok(supplierFunc.get());
         } catch (JedisException je) {
-            // ce.printStackTrace();
             System.out.println(je);
             System.out.println("YOYO CACHE EXCEPTION AQUI");
             return Result.error(ErrorCode.INTERNAL_ERROR);
