@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      service: tukano
+    name: tukano
+  spec:
+    replicas: 1
+    selector: 
+      matchLabels:
+        service: tukano
+    template:
+      metadata:
+        labels:
+          service: tukano
+      spec:
+        containers:
+          env:
+            - name: REDIS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tukano-secrets
+                  key: REDIS_KEY
+
+          image: /tukano //(fazer upload docker hub)
+          name: tukano
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+      
+      restartPolicy: Always

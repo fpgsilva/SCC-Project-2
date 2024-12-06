@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage
+spec:
+  ports:
+    - protocol: TCP
+      port: //
+      targetPort: // 
+    selector:
+      service: storage

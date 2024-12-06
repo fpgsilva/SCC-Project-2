@@ -1,0 +1,42 @@
+services:
+  tukano-app:
+    build:
+      context: ./tukano
+    depends_on:
+      - redis
+      - postgres
+      - storage
+    image: tukano
+    container_name: tukano
+    environment:
+      - CACHE_TYPE=REDIS
+      - REDIS_KEY=${REDIS_KEY}
+      - HIBERNATE_CONFIG= //
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - BLOB_STORAGE_TYPE=REMOTE
+      - BLOB_STORAGE_TOKEN=${BLOB_STORAGE_TOKEN}
+    ports:
+      - //
+
+  storage:
+    build:
+      context: ./blob_storage
+      image: storage
+      container_name: storage
+      environment:
+        - STORAGE_TOKEN=${BLOB_STORAGE_TOKEN}
+
+  redis:
+    image: redis
+    container_name: redis
+    command: ["redis-server", "--requirepass", "${REDIS_KEY}"]
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASS=${DB_PASS}
+      - POSTGRES_NAME=${DB_NAME}

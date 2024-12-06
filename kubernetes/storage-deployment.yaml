@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      service: storage
+    name: storage
+  spec:
+    replicas: 1
+    selector: 
+      matchLabels:
+        service: storage
+    template:
+      metadata:
+        labels:
+          service: storage
+      spec:
+        containers:
+          env:
+            - name: REDIS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tukano-secrets
+                  key: REDIS_KEY
+
+          image: storage
+          name: storage
+      
+      restartPolicy: Always

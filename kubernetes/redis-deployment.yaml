@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      service: redis
+    name: redis
+  spec:
+    replicas: 1
+    selector: 
+      matchLabels:
+        service: redis
+    template:
+      metadata:
+        labels:
+          service: redis
+      spec:
+        containers:
+          - args:
+            - redis-server
+            - --requirepass
+            - '${REDIS_KEY}'
+          env:
+            - name: REDIS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tukano-secrets
+                  key: REDIS_KEY
+
+          image: redis
+          name: redis
+      
+      restartPolicy: Always
