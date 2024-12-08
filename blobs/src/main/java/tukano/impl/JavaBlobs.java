@@ -16,6 +16,7 @@ import tukano.impl.storage.FilesystemStorage;
 import tukano.impl.storage.CloudsystemStorage;
 import utils.Hash;
 import utils.Hex;
+import tukano.impl.Token;
 
 public class JavaBlobs implements Blobs {
 
