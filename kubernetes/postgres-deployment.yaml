@@ -15,14 +15,14 @@ apiVersion: apps/v1
           service: postgres
       spec:
         containers:
-          env:
-            - name: REDIS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: tukano-secrets
-                  key: REDIS_KEY
-
           image: postgres
           name: postgres
-      
+          env:
+          - name: POSTGRES_DB
+            value: "tukano"
+          - name: POSTGRES_USER
+            value: "tukano"
+          - name: POSTGRES_PASSWORD
+            value: "tukano"
+    
       restartPolicy: Always

@@ -1,7 +1,4 @@
-FROM openjdk:17-jdk-slim
-
-WORKDIR /app
-
-COPY target/storage-jar-with-dependencies.jar /app/storage-jar-with-dependencies.jar
-
-CMD ["java", "-jar", "storage-jar-with-dependencies.jar"]
+FROM tomcat:10.0-jdk17-openjdk
+WORKDIR /usr/local/tomcat
+ADD blobs-1.war webapps
+EXPOSE 8080

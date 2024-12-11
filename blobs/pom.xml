@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>scc2425</groupId>
-	<artifactId>tukano</artifactId>
+	<artifactId>blobs</artifactId>
 	<version>1</version>
 	<packaging>war</packaging>
 	<properties>
@@ -36,7 +36,7 @@
 					<url>http://maven:s3cret@127.0.0.1:8080/manager/text</url>
 					<server>tomcat-docker</server>
 					<update>true</update>
-					<path>/tukano</path>
+					<path>/blobs</path>
 					<username>maven</username>
 					<password>s3cret</password>
 

@@ -3,9 +3,10 @@ kind: Service
 metadata:
   name: tukano
 spec:
+  selector:
+    app: tukano
   ports:
-    - protocol: TCP
-      port: 8081
-      targetPort: 8081
-    selector:
-      service: tukano
+    - name: http
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
