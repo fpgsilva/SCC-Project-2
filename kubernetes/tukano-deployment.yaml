@@ -22,7 +22,7 @@ apiVersion: apps/v1
                   name: tukano-secrets
                   key: REDIS_KEY
 
-          image: /tukano //(fazer upload docker hub)
+          image: /tukano
           name: tukano
           ports:
             - containerPort: 8081

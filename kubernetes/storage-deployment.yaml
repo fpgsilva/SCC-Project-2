@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: storage
-        image: fpgsilva/tukano-blobs
+        image: fpgsilva/blobs
         volumeMounts:
         - mountPath: "/tmp/blobs"
           name: blob-volume
