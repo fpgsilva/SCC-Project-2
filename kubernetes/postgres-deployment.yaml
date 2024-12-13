@@ -1,28 +1,28 @@
 apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    labels:
-      service: postgres
-    name: postgres
-  spec:
-    replicas: 1
-    selector: 
-      matchLabels:
-        service: postgres
-    template:
-      metadata:
-        labels:
-          service: postgres
-      spec:
-        containers:
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
           image: postgres
-          name: postgres
+          ports:
+            - containerPort: 5432
           env:
-          - name: POSTGRES_DB
-            value: "tukano"
-          - name: POSTGRES_USER
-            value: "tukano"
-          - name: POSTGRES_PASSWORD
-            value: "tukano"
-    
+            - name: POSTGRES_DB
+              value: "tukano"
+            - name: POSTGRES_USER
+              value: "tukano"
+            - name: POSTGRES_PASSWORD
+              value: "tukano"
+
       restartPolicy: Always

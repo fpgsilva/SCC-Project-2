@@ -13,12 +13,12 @@ spec:
         app: storage
     spec:
       containers:
-      - name: storage
-        image: fpgsilva/blobs
-        volumeMounts:
-        - mountPath: "/tmp/blobs"
-          name: blob-volume
+        - name: storage
+          image: mlatas29/blobs
+          volumeMounts:
+            - mountPath: "/tmp/blobs"
+              name: blob-volume
       volumes:
-      - name: volume
-        persistentVolumeClaim:
-          claimName: storage-pvc
+        - name: blob-volume
+          persistentVolumeClaim:
+            claimName: storage-pvc
