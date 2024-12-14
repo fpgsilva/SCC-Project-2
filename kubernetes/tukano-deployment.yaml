@@ -1,26 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    service: tukano
   name: tukano
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: tukano
+      app: tukano
   template:
     metadata:
       labels:
-        service: tukano
+        app: tukano
     spec:
       containers:
-        - image: /tukano
+        - image: mlatas29/tukano
           name: tukano
           ports:
-            - containerPort: 8081
+            - containerPort: 8080
               protocol: TCP
           env:
             - name: STORAGE
-              value: "http://172.205.12.90:8080/blobs-1/rest"
+              value: "http://48.209.144.67:8080/blobs-1/rest"
       restartPolicy: Always

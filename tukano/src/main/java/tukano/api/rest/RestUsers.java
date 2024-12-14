@@ -12,6 +12,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import tukano.api.User;
 
 @Path(RestUsers.PATH)
@@ -31,7 +32,7 @@ public interface RestUsers {
 	@GET
 	@Path("/{" + USER_ID + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	User getUser(@PathParam(USER_ID) String userId, @QueryParam(PWD) String pwd);
+	Response getUser(@PathParam(USER_ID) String userId, @QueryParam(PWD) String pwd);
 
 	@PUT
 	@Path("/{" + USER_ID + "}")

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import jakarta.ws.rs.core.Response;
 import tukano.api.Result;
 import tukano.api.Short;
 import tukano.api.Shorts;
@@ -184,7 +185,7 @@ public class JavaShorts implements Shorts {
 		return errorOrValue(okUser(userId, password), DB.sql(format(QUERY_FMT, userId, userId), String.class));
 	}
 
-	protected Result<User> okUser(String userId, String pwd) {
+	protected Result<Response> okUser(String userId, String pwd) {
 		return JavaUsers.getInstance().getUser(userId, pwd);
 	}
 

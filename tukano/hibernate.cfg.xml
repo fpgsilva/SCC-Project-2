@@ -3,7 +3,7 @@
 	<session-factory>
 		<!-- JDBC Database connection settings -->
 		<property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-		<property name="hibernate.connection.url">jdbc:postgresql://database:5432/tukano</property>
+		<property name="hibernate.connection.url">jdbc:postgresql://postgres:5432/tukano</property>
 		<property name="hibernate.connection.username">tukano</property>
 		<property name="hibernate.connection.password">tukano</property>
 

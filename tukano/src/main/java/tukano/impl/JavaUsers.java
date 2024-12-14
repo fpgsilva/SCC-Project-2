@@ -9,14 +9,19 @@ import static tukano.api.Result.ErrorCode.BAD_REQUEST;
 import static tukano.api.Result.ErrorCode.FORBIDDEN;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 import srv.Authentication;
+import srv.Session;
 import tukano.api.Result;
 import tukano.api.User;
 import tukano.api.Users;
 import tukano.impl.cache.Cache;
+import tukano.impl.cache.RedisCache;
 import utils.DB;
 
 public class JavaUsers implements Users {
@@ -52,7 +57,7 @@ public class JavaUsers implements Users {
 	}
 
 	@Override
-	public Result<User> getUser(String userId, String pwd) {
+	public Result<Response> getUser(String userId, String pwd) {
 		Log.info(() -> format("getUser : userId = %s, pwd = %s\n", userId, pwd));
 
 		if (userId == null)
@@ -65,8 +70,24 @@ public class JavaUsers implements Users {
 			}
 		} else
 			result = DB.getOne(userId, User.class);
-		Authentication.login(userId, pwd);
-		return validatedUserOrError(result, pwd);
+
+		// Authentication.login(userId, pwd);
+
+		String uid = UUID.randomUUID().toString();
+		var cookie = new NewCookie.Builder("scc:session")
+				.value(uid).path("/")
+				.comment("sessionid")
+				.maxAge(3600)
+				.secure(false) // ideally it should be true to only work for https requests
+				.httpOnly(true)
+				.build();
+		// maybe not fake redis layer
+		RedisCache.getRedisCache().putSession(new Session(uid, userId));
+		var smth = validatedUserOrError(result, pwd);
+		if (smth.isOK()) {
+			return ok(Response.ok(result.value()).cookie(cookie).build());
+		}
+		return error(smth.error());
 	}
 
 	@Override

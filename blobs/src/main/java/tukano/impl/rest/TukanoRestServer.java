@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.glassfish.jersey.server.ResourceConfig;
+
 import jakarta.ws.rs.core.Application;
 import srv.Authentication;
 //import srv.ControlResource;
@@ -28,6 +30,7 @@ public class TukanoRestServer extends Application {
 	public TukanoRestServer() {
 		serverURI = "";
 		Token.setSecret(Args.valueOf("-secret", "spotingale"));
+		singletons.add(new ResourceConfig());
 		resources.add(RestBlobsResource.class);
 		resources.add(RequestCookiesFilter.class);
 		resources.add(RequestCookiesCleanupFilter.class);

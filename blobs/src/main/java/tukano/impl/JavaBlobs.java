@@ -1,4 +1,4 @@
-package src.tukano.impl;
+package tukano.impl;
 
 import static java.lang.String.format;
 import static tukano.api.Result.error;
