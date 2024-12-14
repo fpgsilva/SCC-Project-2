@@ -83,6 +83,7 @@ public class JavaUsers implements Users {
 				.build();
 		// maybe not fake redis layer
 		RedisCache.getRedisCache().putSession(new Session(uid, userId));
+
 		var smth = validatedUserOrError(result, pwd);
 		if (smth.isOK()) {
 			return ok(Response.ok(result.value()).cookie(cookie).build());

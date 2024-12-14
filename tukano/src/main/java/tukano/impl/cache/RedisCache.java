@@ -19,9 +19,8 @@ import tukano.impl.data.Likes;
 import utils.JSON;
 
 public class RedisCache {
-    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "redis"); // docker service -
-                                                                                                  // name
-    private static final String REDIS_KEY = System.getenv("REDIS_KEY");
+    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "redis");
+    private static final String REDIS_KEY = System.getenv().getOrDefault("REDIS_KEY", "sportingale");
     private static final int REDIS_PORT = 6380;
     private static final int REDIS_TIMEOUT = 1000;
 

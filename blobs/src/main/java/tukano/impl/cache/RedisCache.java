@@ -19,8 +19,8 @@ import tukano.impl.data.Likes;
 import utils.JSON;
 
 public class RedisCache {
-    private static final String RedisHostname = "";// docker service - name
-    private static final String RedisKey = "";
+    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "redis");
+    private static final String REDIS_KEY = System.getenv().getOrDefault("REDIS_KEY", "sportingale");
     private static final int REDIS_PORT = 6380;
     private static final int REDIS_TIMEOUT = 1000;
     private static final boolean Redis_USE_TLS = true;
@@ -63,7 +63,7 @@ public class RedisCache {
         poolConfig.setTestWhileIdle(true);
         poolConfig.setNumTestsPerEvictionRun(3);
         poolConfig.setBlockWhenExhausted(true);
-        jedis_instance = new JedisPool(poolConfig, RedisHostname, REDIS_PORT, REDIS_TIMEOUT, RedisKey, Redis_USE_TLS);
+        jedis_instance = new JedisPool(poolConfig, REDIS_HOST, REDIS_PORT, REDIS_TIMEOUT, REDIS_KEY, Redis_USE_TLS);
         return jedis_instance;
     }
 
