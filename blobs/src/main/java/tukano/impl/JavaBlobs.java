@@ -26,7 +26,7 @@ public class JavaBlobs implements Blobs {
 	public String baseURI;
 	private BlobStorage storage;
 
-	private boolean cloud = true;
+	private boolean cloud = false;
 
 	synchronized public static Blobs getInstance() {
 		if (instance == null)

@@ -20,5 +20,5 @@ spec:
               protocol: TCP
           env:
             - name: STORAGE
-              value: "http://48.209.144.67:8080/blobs-1/rest"
+              value: "http://4.207.0.141:8080/blobs-1/rest"
       restartPolicy: Always

@@ -19,9 +19,9 @@ import tukano.impl.data.Likes;
 import utils.JSON;
 
 public class RedisCache {
-    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "redis");
+    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "cache");
     private static final String REDIS_KEY = System.getenv().getOrDefault("REDIS_KEY", "sportingale");
-    private static final int REDIS_PORT = 6380;
+    private static final int REDIS_PORT = 6379;
     private static final int REDIS_TIMEOUT = 1000;
 
     private static JedisPool jedis_instance;
@@ -30,8 +30,7 @@ public class RedisCache {
     private static String MOST_RECENT_SHORTS_LIST = "MostRecentShorts";
     private static String MOST_RECENT_LIKES_LIST = "MostRecentLikes";
     private static String MOST_RECENT_FOLLOWS_LIST = "MostRecentFollows";
-
-    Map<String, Session> sessions = new ConcurrentHashMap<>();
+    private static String MOST_RECENT_SESSION_LIST = "MostRecentSession";
 
     public static synchronized RedisCache getRedisCache() {
         if (redis_instance != null)
@@ -39,14 +38,6 @@ public class RedisCache {
 
         redis_instance = new RedisCache();
         return redis_instance;
-    }
-
-    public void putSession(Session s) {
-        sessions.put(s.uid(), s);
-    }
-
-    public Session getSession(String uid) {
-        return sessions.get(uid);
     }
 
     public synchronized static JedisPool getCachePool() {
@@ -73,6 +64,12 @@ public class RedisCache {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + id;
                 var value = jedis.get(key);
+                
+                System.out.println("::::::::::::::::::::::::::::GET ONE TUKANO:::::::::::::::::::::::::::::::::");
+                System.out.println(key);
+                System.out.println(value);
+                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
                 return value != null ? JSON.decode(value, clazz) : null;
             }
         }, cId);
@@ -124,6 +121,43 @@ public class RedisCache {
                 }
 
                 var result = jedis.get(key);
+                System.out.println(":::::::::::::::::::::::::::::INSERT ONE OBJ TUKANO::::::::::::::::::::::::::::::::");
+                System.out.println(key);
+                System.out.println(value);
+                System.out.println(list);
+                System.out.println(result);
+                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
+                return JSON.decode(result, obj.getClass());
+            }
+        }, cId);
+    }
+
+public <T> Result<?> insertOne(String id, T obj) {
+        var cId = obj.getClass().getName();
+        System.out.println(cId);
+        return tryCatch(() -> {
+            try (Jedis jedis = getCachePool().getResource()) {
+                var key = cId.toLowerCase() + ":" + id;
+                var value = JSON.encode(obj);
+                jedis.setex(key, 3600, value);
+
+                // depends on the type of object
+                var list = getObjectList(obj);
+                jedis.lpush(list, value);
+                if (jedis.llen(list) > 5) {
+                    jedis.ltrim(list, 0, 4);
+                }
+
+                var result = jedis.get(key);
+
+                System.out.println("::::::::::::::::::::::::::::::INSERT ONE OBJ STING TUKANO:::::::::::::::::::::::::::::::");
+                System.out.println(key);
+                System.out.println(value);
+                System.out.println(list);
+                System.out.println(result);
+                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
                 return JSON.decode(result, obj.getClass());
             }
         }, cId);
@@ -139,6 +173,8 @@ public class RedisCache {
                 return MOST_RECENT_LIKES_LIST;
             case "tukano.impl.data.Following":
                 return MOST_RECENT_FOLLOWS_LIST;
+            case "srv.Session":
+                return MOST_RECENT_SESSION_LIST;
             default:
                 return null;
         }
@@ -154,6 +190,8 @@ public class RedisCache {
                 return ((Likes) obj).getShortId() + ":" + ((Likes) obj).getUserId();
             case "tukano.impl.data.Following":
                 return ((Following) obj).getFollowee() + ":" + ((Following) obj).getFollower();
+            case "srv.Session":
+                return ((Session) obj).uid();
             default:
                 return null;
         }

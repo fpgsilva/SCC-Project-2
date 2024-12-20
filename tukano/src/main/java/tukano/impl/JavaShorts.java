@@ -185,8 +185,8 @@ public class JavaShorts implements Shorts {
 		return errorOrValue(okUser(userId, password), DB.sql(format(QUERY_FMT, userId, userId), String.class));
 	}
 
-	protected Result<Response> okUser(String userId, String pwd) {
-		return JavaUsers.getInstance().getUser(userId, pwd);
+	protected Result<User> okUser(String userId, String pwd) {
+		return JavaUsers.getInstance().okUser(userId, pwd);
 	}
 
 	private Result<Void> okUser(String userId) {

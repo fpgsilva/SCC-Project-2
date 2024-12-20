@@ -19,11 +19,10 @@ import tukano.impl.data.Likes;
 import utils.JSON;
 
 public class RedisCache {
-    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "redis");
+    private static final String REDIS_HOST = System.getenv().getOrDefault("REDIS_HOST", "cache");
     private static final String REDIS_KEY = System.getenv().getOrDefault("REDIS_KEY", "sportingale");
-    private static final int REDIS_PORT = 6380;
+    private static final int REDIS_PORT = 6379;
     private static final int REDIS_TIMEOUT = 1000;
-    private static final boolean Redis_USE_TLS = true;
 
     private static JedisPool jedis_instance;
     private static RedisCache redis_instance;
@@ -31,8 +30,7 @@ public class RedisCache {
     private static String MOST_RECENT_SHORTS_LIST = "MostRecentShorts";
     private static String MOST_RECENT_LIKES_LIST = "MostRecentLikes";
     private static String MOST_RECENT_FOLLOWS_LIST = "MostRecentFollows";
-
-    Map<String, Session> sessions = new ConcurrentHashMap<>();
+    private static String MOST_RECENT_SESSION_LIST = "MostRecentSession";
 
     public static synchronized RedisCache getRedisCache() {
         if (redis_instance != null)
@@ -40,14 +38,6 @@ public class RedisCache {
 
         redis_instance = new RedisCache();
         return redis_instance;
-    }
-
-    public void putSession(Session s) {
-        sessions.put(s.uid(), s);
-    }
-
-    public Session getSession(String uid) {
-        return sessions.get(uid);
     }
 
     public synchronized static JedisPool getCachePool() {
@@ -63,15 +53,13 @@ public class RedisCache {
         poolConfig.setTestWhileIdle(true);
         poolConfig.setNumTestsPerEvictionRun(3);
         poolConfig.setBlockWhenExhausted(true);
-        jedis_instance = new JedisPool(poolConfig, REDIS_HOST, REDIS_PORT, REDIS_TIMEOUT, REDIS_KEY, Redis_USE_TLS);
+
+        jedis_instance = new JedisPool(poolConfig, REDIS_HOST, REDIS_PORT, REDIS_TIMEOUT, REDIS_KEY);
         return jedis_instance;
     }
 
     public <T> Result<T> getOne(String id, Class<T> clazz) {
-        // System.out.println("GET ONE CACHE LAYER");
         var cId = clazz.getName();
-        // System.out.println("class name on redis is ");
-        // System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + id;
@@ -119,7 +107,7 @@ public class RedisCache {
                 var value = JSON.encode(obj);
                 jedis.set(key, value);
 
-                // depende do tipo de obj
+                // depends on the type of object
                 var list = getObjectList(obj);
                 jedis.lpush(list, value);
                 if (jedis.llen(list) > 5) {
@@ -127,6 +115,43 @@ public class RedisCache {
                 }
 
                 var result = jedis.get(key);
+
+                System.out.println("::::::::::::::::::::::::::::::INSERT ONE OBJ STORAGE BLOBS:::::::::::::::::::::::::::::::");
+                System.out.println(key);
+                System.out.println(value);
+                System.out.println(list);
+                System.out.println(result);
+                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
+                return JSON.decode(result, obj.getClass());
+            }
+        }, cId);
+    }
+
+    public <T> Result<?> insertOne(String key, T obj) {
+        var cId = obj.getClass().getName();
+        System.out.println(cId);
+        return tryCatch(() -> {
+            try (Jedis jedis = getCachePool().getResource()) {
+                var value = JSON.encode(obj);
+                jedis.setex(key, 3600, value);
+
+                // depends on the type of object
+                var list = getObjectList(obj);
+                jedis.lpush(list, value);
+                if (jedis.llen(list) > 5) {
+                    jedis.ltrim(list, 0, 4);
+                }
+
+                var result = jedis.get(key);
+
+                System.out.println("::::::::::::::::::::::::::::INSERT ONE OBJ STRING STORAGE BLOBS:::::::::::::::::::::::::::::::::");
+                System.out.println(key);
+                System.out.println(value);
+                System.out.println(list);
+                System.out.println(result);
+                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
                 return JSON.decode(result, obj.getClass());
             }
         }, cId);
@@ -142,6 +167,8 @@ public class RedisCache {
                 return MOST_RECENT_LIKES_LIST;
             case "tukano.impl.data.Following":
                 return MOST_RECENT_FOLLOWS_LIST;
+            case "srv.Session":
+                return MOST_RECENT_SESSION_LIST;
             default:
                 return null;
         }
@@ -157,6 +184,9 @@ public class RedisCache {
                 return ((Likes) obj).getShortId() + ":" + ((Likes) obj).getUserId();
             case "tukano.impl.data.Following":
                 return ((Following) obj).getFollowee() + ":" + ((Following) obj).getFollower();
+            case "srv.Session":
+                System.out.println("::::::::::::::::::::::AAAHHHHHHH:::::::::::::::::::::::::::::::::::::::");
+                return ((Session) obj).uid();
             default:
                 return null;
         }
@@ -166,7 +196,6 @@ public class RedisCache {
         try {
             return Result.ok(supplierFunc.get());
         } catch (JedisException je) {
-            // ce.printStackTrace();
             System.out.println(je);
             System.out.println("YOYO CACHE EXCEPTION AQUI");
             return Result.error(ErrorCode.INTERNAL_ERROR);

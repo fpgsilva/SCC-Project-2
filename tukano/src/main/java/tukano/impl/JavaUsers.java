@@ -71,8 +71,6 @@ public class JavaUsers implements Users {
 		} else
 			result = DB.getOne(userId, User.class);
 
-		// Authentication.login(userId, pwd);
-
 		String uid = UUID.randomUUID().toString();
 		var cookie = new NewCookie.Builder("scc:session")
 				.value(uid).path("/")
@@ -82,13 +80,32 @@ public class JavaUsers implements Users {
 				.httpOnly(true)
 				.build();
 		// maybe not fake redis layer
-		RedisCache.getRedisCache().putSession(new Session(uid, userId));
+		RedisCache.getRedisCache().insertOne(uid, new Session( uid, userId));	
 
 		var smth = validatedUserOrError(result, pwd);
 		if (smth.isOK()) {
 			return ok(Response.ok(result.value()).cookie(cookie).build());
 		}
 		return error(smth.error());
+	}
+
+	@Override
+	public Result<User> okUser(String userId, String pwd) {
+		Log.info(() -> format("getUser : userId = %s, pwd = %s\n", userId, pwd));
+
+		if (userId == null)
+			return error(BAD_REQUEST);
+
+		Result<User> result;
+		if (cache) {
+			result = Cache.getOne(userId, User.class);
+			if (!result.isOK()) {
+				result = DB.getOne(userId, User.class);
+			}
+		} else
+			result = DB.getOne(userId, User.class);
+	
+		return validatedUserOrError(result, pwd);
 	}
 
 	@Override

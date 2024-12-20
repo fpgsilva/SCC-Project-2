@@ -1,23 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis
+  name: cache
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: redis
+      app: cache
   template:
     metadata:
       labels:
-        service: redis
+        app: cache
     spec:
       containers:
         - image: redis
-          name: redis
+          name: cache
           args:
             - redis-server
             - --requirepass
             - "sportingale"
-
-      restartPolicy: Always

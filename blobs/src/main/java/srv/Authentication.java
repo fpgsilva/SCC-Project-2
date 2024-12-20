@@ -17,7 +17,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import srv.auth.RequestCookies;
+import srv.Session;
 import tukano.impl.cache.RedisCache;
+
 
 public class Authentication {
 	static final String PATH = "login";
@@ -40,8 +42,18 @@ public class Authentication {
 					.httpOnly(true)
 					.build();
 			//maybe not fake redis layer
-			RedisCache.getRedisCache().putSession( new Session( uid, userID));	
+
+			var session = new Session( uid, userID);
+			var result = RedisCache.getRedisCache().insertOne(uid, session);	
 			
+			System.out.println("::::::::::::::::::::::::::::LOGIN STORAGE BLOBS:::::::::::::::::::::::::::::::::");
+			System.out.println(uid);
+			System.out.println(cookie);
+			System.out.println(session);
+			System.out.println(result);
+			System.out.println(result.value());
+			System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
             return Response.ok()
                     .cookie(cookie) 
                     .build();
@@ -69,7 +81,8 @@ public class Authentication {
 		if (cookie == null )
 			throw new NotAuthorizedException("No session initialized");
 		
-		var session = RedisCache.getRedisCache().getSession( cookie.getValue());
+		var session = RedisCache.getRedisCache().getOne(cookie.getValue(), Session.class).value();
+
 		if( session == null )
 			throw new NotAuthorizedException("No valid session initialized");
 			
@@ -88,7 +101,15 @@ public class Authentication {
 		if (cookie == null )
 			throw new NotAuthorizedException("No session initialized");
 		
-		var session = RedisCache.getRedisCache().getSession( cookie.getValue());
+		var result = RedisCache.getRedisCache().getOne(cookie.getValue(), Session.class);
+		var session = result.value();
+		System.out.println(":::::::::::::::::::::::::::VALIDATE SESSION STORAGE BLOBS::::::::::::::::::::::::::::::::::");
+		System.out.println(result);
+		System.out.println(cookie);
+		System.out.println(cookie.getValue());
+		System.out.println(session);
+		System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
 		if( session == null )
 			throw new NotAuthorizedException("No valid session initialized");
 			

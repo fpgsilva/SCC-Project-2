@@ -34,6 +34,15 @@ public class RestUsersClient extends RestClient implements Users {
 				Response.class);
 	}
 
+	private Result<User> _okUser(String userId, String pwd) {
+		return super.toJavaResult(
+				target.path(userId)
+						.queryParam(RestUsers.PWD, pwd).request()
+						.accept(MediaType.APPLICATION_JSON)
+						.get(),
+				User.class);
+	}
+
 	public Result<User> _updateUser(String userId, String password, User user) {
 		return super.toJavaResult(
 				target
@@ -75,6 +84,11 @@ public class RestUsersClient extends RestClient implements Users {
 	@Override
 	public Result<Response> getUser(String userId, String pwd) {
 		return super.reTry(() -> _getUser(userId, pwd));
+	}
+
+	@Override
+	public Result<User> okUser(String userId, String pwd) {
+		return super.reTry(() -> _okUser(userId, pwd));
 	}
 
 	@Override
