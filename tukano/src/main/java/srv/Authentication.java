@@ -30,7 +30,7 @@ public class Authentication {
 	private static final int MAX_COOKIE_AGE = 3600;
 
 	public static Response login( String userID,String password ) {
-		System.out.println("user: " + userID + " pwd:" + password );
+		//System.out.println("user: " + userID + " pwd:" + password );
 		boolean pwdOk = true; //replace with code to check user password
 		if (pwdOk) {
 			String uid = UUID.randomUUID().toString();
@@ -45,14 +45,6 @@ public class Authentication {
 
 			var session = new Session( uid, userID);
 			var result = RedisCache.getRedisCache().insertOne(uid, session);	
-			
-			System.out.println("::::::::::::::::::::::::::::LOGIN TUKANO:::::::::::::::::::::::::::::::::");
-			System.out.println(uid);
-			System.out.println(cookie);
-			System.out.println(session);
-			System.out.println(result);
-			System.out.println(result.value());
-			System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
             return Response.ok()
                     .cookie(cookie) 
@@ -101,13 +93,7 @@ public class Authentication {
 		if (cookie == null )
 			throw new NotAuthorizedException("No session initialized");
 		
-		var result = RedisCache.getRedisCache().getOne(cookie.getValue(), Session.class);
-		var session = result.value();
-		System.out.println(":::::::::::::::::::::::::::VALIDATE TUKANO::::::::::::::::::::::::::::::::::");
-		System.out.println(result);
-		System.out.println(cookie);
-		System.out.println(session);
-		System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+		var session = RedisCache.getRedisCache().getOne(cookie.getValue(), Session.class).value();
 
 		if( session == null )
 			throw new NotAuthorizedException("No valid session initialized");

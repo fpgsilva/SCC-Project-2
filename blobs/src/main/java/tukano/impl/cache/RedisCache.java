@@ -43,7 +43,7 @@ public class RedisCache {
     public synchronized static JedisPool getCachePool() {
         if (jedis_instance != null)
             return jedis_instance;
-        System.out.println("WILL RETURN NEW CACHE");
+        //System.out.println("WILL RETURN NEW CACHE");
         var poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(128);
         poolConfig.setMaxIdle(128);
@@ -100,7 +100,7 @@ public class RedisCache {
 
     public <T> Result<?> insertOne(T obj) {
         var cId = obj.getClass().getName();
-        System.out.println(cId);
+        //System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + getObjectId(obj);
@@ -116,13 +116,6 @@ public class RedisCache {
 
                 var result = jedis.get(key);
 
-                System.out.println("::::::::::::::::::::::::::::::INSERT ONE OBJ STORAGE BLOBS:::::::::::::::::::::::::::::::");
-                System.out.println(key);
-                System.out.println(value);
-                System.out.println(list);
-                System.out.println(result);
-                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-
                 return JSON.decode(result, obj.getClass());
             }
         }, cId);
@@ -130,7 +123,7 @@ public class RedisCache {
 
     public <T> Result<?> insertOne(String key, T obj) {
         var cId = obj.getClass().getName();
-        System.out.println(cId);
+        //System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var value = JSON.encode(obj);
@@ -144,13 +137,6 @@ public class RedisCache {
                 }
 
                 var result = jedis.get(key);
-
-                System.out.println("::::::::::::::::::::::::::::INSERT ONE OBJ STRING STORAGE BLOBS:::::::::::::::::::::::::::::::::");
-                System.out.println(key);
-                System.out.println(value);
-                System.out.println(list);
-                System.out.println(result);
-                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
                 return JSON.decode(result, obj.getClass());
             }
@@ -185,7 +171,6 @@ public class RedisCache {
             case "tukano.impl.data.Following":
                 return ((Following) obj).getFollowee() + ":" + ((Following) obj).getFollower();
             case "srv.Session":
-                System.out.println("::::::::::::::::::::::AAAHHHHHHH:::::::::::::::::::::::::::::::::::::::");
                 return ((Session) obj).uid();
             default:
                 return null;
@@ -196,8 +181,8 @@ public class RedisCache {
         try {
             return Result.ok(supplierFunc.get());
         } catch (JedisException je) {
-            System.out.println(je);
-            System.out.println("YOYO CACHE EXCEPTION AQUI");
+            //System.out.println(je);
+            System.out.println("CACHE EXCEPTION");
             return Result.error(ErrorCode.INTERNAL_ERROR);
         } catch (Exception x) {
             System.out.println("EXCEPTION X TRY CATCH");

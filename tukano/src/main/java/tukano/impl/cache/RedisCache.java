@@ -43,7 +43,7 @@ public class RedisCache {
     public synchronized static JedisPool getCachePool() {
         if (jedis_instance != null)
             return jedis_instance;
-        System.out.println("WILL RETURN NEW CACHE");
+        //System.out.println("WILL RETURN NEW CACHE");
         var poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(128);
         poolConfig.setMaxIdle(128);
@@ -64,11 +64,6 @@ public class RedisCache {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + id;
                 var value = jedis.get(key);
-                
-                System.out.println("::::::::::::::::::::::::::::GET ONE TUKANO:::::::::::::::::::::::::::::::::");
-                System.out.println(key);
-                System.out.println(value);
-                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
                 return value != null ? JSON.decode(value, clazz) : null;
             }
@@ -106,7 +101,7 @@ public class RedisCache {
 
     public <T> Result<?> insertOne(T obj) {
         var cId = obj.getClass().getName();
-        System.out.println(cId);
+        //System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + getObjectId(obj);
@@ -121,12 +116,6 @@ public class RedisCache {
                 }
 
                 var result = jedis.get(key);
-                System.out.println(":::::::::::::::::::::::::::::INSERT ONE OBJ TUKANO::::::::::::::::::::::::::::::::");
-                System.out.println(key);
-                System.out.println(value);
-                System.out.println(list);
-                System.out.println(result);
-                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
                 return JSON.decode(result, obj.getClass());
             }
@@ -135,7 +124,7 @@ public class RedisCache {
 
 public <T> Result<?> insertOne(String id, T obj) {
         var cId = obj.getClass().getName();
-        System.out.println(cId);
+        //System.out.println(cId);
         return tryCatch(() -> {
             try (Jedis jedis = getCachePool().getResource()) {
                 var key = cId.toLowerCase() + ":" + id;
@@ -150,13 +139,6 @@ public <T> Result<?> insertOne(String id, T obj) {
                 }
 
                 var result = jedis.get(key);
-
-                System.out.println("::::::::::::::::::::::::::::::INSERT ONE OBJ STING TUKANO:::::::::::::::::::::::::::::::");
-                System.out.println(key);
-                System.out.println(value);
-                System.out.println(list);
-                System.out.println(result);
-                System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
                 return JSON.decode(result, obj.getClass());
             }
@@ -201,11 +183,11 @@ public <T> Result<?> insertOne(String id, T obj) {
         try {
             return Result.ok(supplierFunc.get());
         } catch (JedisException je) {
-            System.out.println(je);
-            System.out.println("YOYO CACHE EXCEPTION AQUI");
+            //System.out.println(je);
+            //System.out.println("CACHE EXCEPTION");
             return Result.error(ErrorCode.INTERNAL_ERROR);
         } catch (Exception x) {
-            System.out.println("EXCEPTION X TRY CATCH");
+            //System.out.println("EXCEPTION X TRY CATCH");
             x.printStackTrace();
             return Result.error(ErrorCode.INTERNAL_ERROR);
         }

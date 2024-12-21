@@ -17,7 +17,7 @@ final public class IO {
 
 	public static void write( File out, byte[] data ) {
 		try {
-			System.out.println("WRITE>>>>" + out);
+			System.out.println("WRITE TO " + out);
 			
 			Files.write( out.toPath(), data);
 		} catch( Exception x ) {
@@ -27,7 +27,7 @@ final public class IO {
 
 	public static byte[] read( File from) {
 		try {
-			System.out.println("READ>>>>" + from);
+			System.out.println("READ FROM " + from);
 			return Files.readAllBytes( from.toPath() );
 		} catch( Exception x ) {
 			x.printStackTrace();

@@ -210,7 +210,7 @@ public class JavaShorts implements Shorts {
 
 			// delete shorts
 			var query1 = format("DELETE FROM Short s WHERE s.ownerId = '%s'", userId);
-			System.out.println("user id to delete is " + userId);
+			//System.out.println("user id to delete is " + userId);
 			hibernate.createQuery(query1, Short.class).executeUpdate();
 
 			// delete follows

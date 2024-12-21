@@ -121,7 +121,7 @@ public class CosmosDBLayer {
 	}
 
 	public <T> Result<T> insertOne(T obj) {
-		System.out.println("INSERT ONE COSMOS LAYER");
+		//System.out.println("INSERT ONE COSMOS LAYER");
 		var cId = obj.getClass().getName();
 		return tryCatch(() -> container.createItem(obj).getItem(), cId);
 	}
@@ -141,8 +141,8 @@ public class CosmosDBLayer {
 			return Result.ok(supplierFunc.get());
 		} catch (CosmosException ce) {
 			// ce.printStackTrace();
-			System.out.println(ce);
-			System.out.println("YOYO COSMOS EXCEPTION AQUI");
+			//System.out.println(ce);
+			System.out.println("COSMOS EXCEPTION");
 			return Result.error(errorCodeFromStatus(ce.getStatusCode()));
 		} catch (Exception x) {
 			System.out.println("EXCEPTION X TRY CATCH");
