@@ -1,4 +1,5 @@
 config:
+  target: "http://4.207.0.169:80" # Base URL for most requests
   plugins:
     metrics-by-endpoint: {} # Used to get metrics for each endpoint individually.
   processor: ./test-utils.js
@@ -15,7 +16,7 @@ scenarios:
     weight: 10
     flow:
       - post:
-          url: http://4.207.0.169:80/tukano-1/rest/users/
+          url: "/tukano-1/rest/users/"
           headers:
             Content-Type: application/json
             Accept: application/json
@@ -27,7 +28,7 @@ scenarios:
     flow:
       - get:
           beforeRequest: "getLoginDetails"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ userId }}/shorts
+          url: "/tukano-1/rest/shorts/{{ userId }}/shorts"
           headers:
             Accept: application/json
 
@@ -36,28 +37,28 @@ scenarios:
     flow:
       - post:
           beforeRequest: "getLoginDetails"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ userId }}?pwd={{ pwd }}
+          url: "/tukano-1/rest/shorts/{{ userId }}?pwd={{ pwd }}"
           afterResponse: "processVideoAddReply"
       - post:
           beforeRequest: "uploadBlobBody"
-          url: http://4.207.0.141:8080/blobs-1/rest/blobs/{{ blobUrl }}
+          url: "http://4.207.0.141:8080/blobs-1/rest/blobs/{{ blobUrl }}"
 
   - name: "Download short"
     weight: 100
     flow:
       - get:
           beforeRequest: "getShortDownloadDetails"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ shortId }}
+          url: "/tukano-1/rest/shorts/{{ shortId }}"
           afterResponse: "processVideoGetReply"
       - get:
-          url: http://4.207.0.141:8080/blobs-1/rest/blobs/{{ blobUrl }}
+          url: "http://4.207.0.141:8080/blobs-1/rest/blobs/{{ blobUrl }}"
 
   - name: "View feed"
     weight: 200
     flow:
       - get:
           beforeRequest: "getLoginDetails"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ userId }}/feed?pwd={{ pwd }}
+          url: "/tukano-1/rest/shorts/{{ userId }}/feed?pwd={{ pwd }}"
           headers:
             Accept: application/json
 
@@ -66,24 +67,26 @@ scenarios:
     flow:
       - post:
           beforeRequest: "setupLikeShort"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ shortId }}/{{ userId }}/likes?pwd={{ pwd }}
+          url: "/tukano-1/rest/shorts/{{ shortId }}/{{ userId }}/likes?pwd={{ pwd }}"
           headers:
             Content-Type: application/json
           body: '"True"'
+
   - name: "Get Short Likes"
     weight: 25
     flow:
       - get:
           beforeRequest: "getShortDownloadDetails"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ shortId }}/likes?pwd={{ pwd }}
+          url: "/tukano-1/rest/shorts/{{ shortId }}/likes?pwd={{ pwd }}"
           headers:
             Accept: application/json
+
   - name: "Get User Follows"
     weight: 20
     flow:
       - get:
           beforeRequest: "getLoginDetails"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ userId }}/followers?pwd={{ pwd }}
+          url: "/tukano-1/rest/shorts/{{ userId }}/followers?pwd={{ pwd }}"
           headers:
             Accepts: application/json
 
@@ -92,7 +95,7 @@ scenarios:
     flow:
       - post:
           beforeRequest: "getFollowDetails"
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{ userId1 }}/{{ userId2 }}/followers?pwd={{ pwd }}
+          url: "/tukano-1/rest/shorts/{{ userId1 }}/{{ userId2 }}/followers?pwd={{ pwd }}"
           headers:
             Content-Type: application/json
           body: '"True"'

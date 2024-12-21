@@ -1,20 +1,17 @@
 config:
+  target: "http://4.207.0.169:80" # Base URL for Tukano API
   processor: ./test-utils.js
   phases:
     - name: "Warm up" # WARM UP PHASE: duration: 10s, starting with 1 new client/sec up to 5 new clients/sec
       duration: 10
       arrivalRate: 1
       rampTo: 5
-    #- name: "Main test"    # MAIN TESTS: duration: 30s, with 10 new clients/sec. Should be varied depending on scenario.
-    #duration: 30
-    #arrivalRate: 10
   payload:
     path: ./data/users.csv
-    order: random # selects users sequentially, default is random
-    #loadAll: true # load the whole CSV
+    order: random # Selects users sequentially; default is random
     skipHeader: true # The first line is a header, so we want to skip it
-    delimiter: "," # standard delimiter
-    skipEmptyLines: true # not important in our case
+    delimiter: "," # Standard delimiter
+    skipEmptyLines: true # Not important in our case
     fields:
       - "userId"
       - "pwd"
@@ -24,12 +21,12 @@ scenarios:
   - name: TuKano Short Create
     flow:
       - post:
-          url: http://4.207.0.169:80/tukano-1/rest/shorts/{{userId}}?pwd={{pwd}}
+          url: "/tukano-1/rest/shorts/{{userId}}?pwd={{pwd}}" # Relative URL based on the target
           capture:
             json: "$"
             as: "shortInfo"
           afterResponse: "processShortAddReply"
 
       - post:
-          url: "{{shortInfo.blobUrl}}"
+          url: "{{shortInfo.blobUrl}}" # Absolute or derived URL for the blob service
           body: "{{shortInfo.blobUrl}}"
