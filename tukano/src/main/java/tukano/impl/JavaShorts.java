@@ -180,7 +180,7 @@ public class JavaShorts implements Shorts {
 				SELECT s.shortId, s.timestamp FROM Short s, Following f
 					WHERE
 						f.followee = s.ownerId AND f.follower = '%s'
-				ORDER BY s.timestamp DESC""";
+				ORDER BY timestamp DESC""";
 
 		return errorOrValue(okUser(userId, password), DB.sql(format(QUERY_FMT, userId, userId), String.class));
 	}
